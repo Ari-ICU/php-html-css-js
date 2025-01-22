@@ -10,11 +10,9 @@
 
 <body>
 
-
     <div class="container mx-auto p-4">
         <div class="flex items-center">
-            <a href="index.php"
-                class="<?php echo ($_SERVER['PHP_SELF'] == '/index.php' || $_SERVER['PHP_SELF'] == '/') ? 'text-blue-500' : ''; ?>">
+            <a href="index.php">
                 <img src="" alt="logo">
                 <span class="hidden">logo</span>
             </a>
@@ -25,19 +23,36 @@
         <div class="bg-white p-8 rounded-lg shadow-lg w-96 ">
             <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
             <?php
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                $email = $_POST['email'];
-                $password = $_POST['password'];
+            // Database connection settings
+            $host = 'localhost'; // Database host
+            $dbname = 'UserAuth'; // Database name
+            $username = 'root'; // MySQL username
+            $password = 'root'; // MySQL password
+            
+            try {
+                // Connect to the database
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Dummy credentials for demonstration purposes
-                $valid_email = "user@example.com";
-                $valid_password = "password123";
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    $email = $_POST['email'];
+                    $password = $_POST['password'];
 
-                if ($email == $valid_email && $password == $valid_password) {
-                    echo '<p class="text-green-500 text-center">Login successful!</p>';
-                } else {
-                    echo '<p class="text-red-500 text-center">Invalid email or password. Please register below.</p>';
+                    // Fetch user data
+                    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+                    $stmt->execute(['email' => $email]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($user && $user['password'] === $password) { // Use password_hash in real apps
+                        // Redirect to home page after successful login
+                        header("Location: index.php");
+                        exit;
+                    } else {
+                        echo '<p class="text-red-500 text-center">Invalid email or password. Please register below.</p>';
+                    }
                 }
+            } catch (PDOException $e) {
+                echo '<p class="text-red-500 text-center">Error: ' . $e->getMessage() . '</p>';
             }
             ?>
             <form action="" method="POST">

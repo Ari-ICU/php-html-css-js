@@ -60,8 +60,20 @@ addToCart(1, 2);
 addToCart(2, 1);
 removeFromCart(1);
 
-echo "Total items in cart: " . getTotalItems() . "<br>";
-echo "Total price: $" . getTotalPrice($items) . "<br>";
+
+
+echo '<div class="max-w-sm mx-auto p-4 bg-white shadow-lg rounded-lg overflow-hidden">';
+echo '<img class="w-full" src="path/to/your/image.jpg" alt="Cart Image">';
+echo '<div class="px-6 py-4">';
+echo '<h2 class="text-xl font-bold mb-2">Cart Summary</h2>';
+echo '<p class="text-gray-700 text-base">';
+echo 'Total items in cart: ' . getTotalItems();
+echo '</p>';
+echo '<p class="text-gray-700 text-base">';
+echo 'Total price: $' . getTotalPrice($items);
+echo '</p>';
+echo '</div>';
+echo '</div>';
 ?>
 
 

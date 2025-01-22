@@ -11,8 +11,7 @@
 <body>
     <div class="container mx-auto p-4">
         <div class="flex items-center">
-            <a href="index.php"
-                class="<?php echo ($_SERVER['PHP_SELF'] == '/index.php' || $_SERVER['PHP_SELF'] == '/') ? 'text-blue-500' : ''; ?>">
+            <a href="index.php">
                 <img src="" alt="logo">
                 <span class="hidden">logo</span>
             </a>
@@ -21,6 +20,41 @@
     <div class="bg-gray-100 flex items-center justify-center h-screen">
         <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
+            <?php
+            // Database connection settings
+            $host = 'localhost'; // Database host
+            $dbname = 'UserAuth'; // Database name
+            $username = 'root'; // MySQL username
+            $password = 'root'; // MySQL password
+            
+            try {
+                // Establish database connection
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                    $username = $_POST['username'];
+                    $email = $_POST['email'];
+                    $password = $_POST['password'];
+
+                    // Hash the password for security
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                    // Insert user data into the database
+                    $stmt = $pdo->prepare("INSERT INTO users (email, password) VALUES (:email, :password)");
+                    $stmt->execute([
+                        'email' => $email,
+                        'password' => $hashed_password,
+                    ]);
+
+                    // Redirect to login page after successful registration
+                    header("Location: log_in.php");
+                    exit;
+                }
+            } catch (PDOException $e) {
+                echo "<h3 class='text-red-500 mt-4'>Error: " . $e->getMessage() . "</h3>";
+            }
+            ?>
             <form action="register.php" method="post" class="space-y-4">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">Username:</label>
@@ -43,23 +77,8 @@
                 </div>
             </form>
 
-
-            <p class="mt-8 text-center">if you have an account? <a href="log_in.php" class="text-blue-500">Login</a>
-
-
-                <?php
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                    $username = $_POST['username'];
-                    $email = $_POST['email'];
-                    $password = $_POST['password'];
-
-                    // Here you would typically hash the password and save the user data to a database
-                    // For demonstration purposes, we'll just display the data
-                    echo "<h3 class='text-green-500 mt-4'>Registration Successful</h3>";
-                    echo "<p>Username: " . htmlspecialchars($username) . "</p>";
-                    echo "<p>Email: " . htmlspecialchars($email) . "</p>";
-                }
-                ?>
+            <p class="mt-8 text-center">Already have an account? <a href="log_in.php" class="text-blue-500">Login</a>
+            </p>
         </div>
     </div>
 </body>
